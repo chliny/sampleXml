@@ -39,13 +39,21 @@ class sampleXml:
                     xmlDict["attribute"][key]=value.replace('"','')
             xmlDict["data"].append(self.xml2Dict(xmlLst[1:]))
             return xmlDict
+        
+        if xmlLst[0].startswith("<!--"):
+            while xmlLst and not xmlLst[0].strip().endswith("/-->"):
+                xmlLst.pop(0)
+            xmlLst.pop(0)
+
+        if not xmlLst:
+            return xmlDict
 
         firLine = xmlLst[0].strip().split()
         xmlDict["name"] = firLine[0].split()[0].replace('<','').replace('>','')
         for item in firLine[1:]:
             item = item.strip()
             if item.endswith('>'):
-                item = item[:-1]
+                item = item[:-1].strip()
             if '=' in item:
                 key,value = item.split('=')
                 xmlDict["attribute"][key] = value.replace('"','')
@@ -67,7 +75,7 @@ class sampleXml:
 
                 elif line.endswith("/>"):
                     xmlDict["data"].append(self.xml2Dict([line]))
-                else:
+                elif line.startswith("<") and not line.startswith("<!--"):
                     lineLst = line.split()
                     nodeName = lineLst[0].split()[0].replace('<','').replace('>','')
                     childNode.append(line)
@@ -77,7 +85,7 @@ class sampleXml:
     
     def dict2XmlLst(self,dictionary):
         retStr = ""
-        attrStr = " ".join(["%s=%s" % (key,value) for key,value in dictionary["attribute"].items()])
+        attrStr = " ".join(["%s=\"%s\"" % (key,value) for key,value in dictionary["attribute"].items()])
         if not dictionary["data"]:
             retStr = "<%s %s />" % (dictionary["name"],attrStr)
             return [retStr]
