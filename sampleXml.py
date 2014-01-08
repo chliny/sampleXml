@@ -1,6 +1,11 @@
 #!/usr/bin/python
 # -*- coding=UTF-8 -*-
 
+try:
+    from collections import OrderedDict as dict
+except ImportError:
+    pass 
+
 class sampleXml:
     def __init__(self,file):
         self.file = file
@@ -19,10 +24,11 @@ class sampleXml:
 
     def xml2Dict(self,xmlLst):
         xmlDict = {}
-        xmlDict["attribute"] = {}
+        xmlDict["attribute"] = dict()
         xmlDict["data"] = []
+        xmlDict["name"] = ""
 
-        if xmlLst[0][0:5] == "<?xml":
+        if xmlLst[0].strip().startswith("<?xml"):
             firLine = xmlLst[0].strip().split()
             for item in firLine:
                 item = item.strip()
